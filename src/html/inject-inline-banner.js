@@ -19,13 +19,14 @@ function renderInlineBannerScript(config) {
 
   const cookieName = JSON.stringify(config.bannerCookieName || 'banner_closed');
   const cookieMaxAge = JSON.stringify(config.bannerCookieMaxAge || 60 * 60 * 24 * 365);
+  const storageKey = JSON.stringify('site_inline_banner_closed');
   const modalMarkup = JSON.stringify(bannerHtml);
   const styleCss = JSON.stringify(`
 #site-inline-banner-root {
-  --site-inline-banner-overlay: rgba(17, 17, 17, 0.72);
-  --site-inline-banner-surface: #f7f7f8;
+  --site-inline-banner-overlay: rgba(17, 17, 17, 0.68);
+  --site-inline-banner-surface: #f5f5f5;
   --site-inline-banner-border: rgba(17, 17, 17, 0.08);
-  --site-inline-banner-divider: rgba(17, 17, 17, 0.08);
+  --site-inline-banner-divider: rgba(17, 17, 17, 0.09);
   --site-inline-banner-title: #24252c;
   --site-inline-banner-text: #2f3137;
   --site-inline-banner-subtle: #6d7078;
@@ -47,8 +48,8 @@ function renderInlineBannerScript(config) {
 }
 
 html[data-theme="dark"] #site-inline-banner-root {
-  --site-inline-banner-overlay: rgba(0, 0, 0, 0.78);
-  --site-inline-banner-surface: #242424;
+  --site-inline-banner-overlay: rgba(0, 0, 0, 0.72);
+  --site-inline-banner-surface: #262626;
   --site-inline-banner-border: rgba(255, 255, 255, 0.08);
   --site-inline-banner-divider: rgba(255, 255, 255, 0.12);
   --site-inline-banner-title: #f5f5f6;
@@ -61,12 +62,12 @@ html[data-theme="dark"] #site-inline-banner-root {
 }
 
 #site-inline-banner-modal {
-  width: min(90vw, 620px);
-  max-height: min(90vh, 860px);
+  width: min(88vw, 540px);
+  max-height: min(86vh, 720px);
   border: 1px solid var(--site-inline-banner-border);
-  border-radius: 28px;
+  border-radius: 24px;
   background-color: var(--site-inline-banner-surface);
-  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18);
   overflow: hidden;
 }
 
@@ -74,14 +75,14 @@ html[data-theme="dark"] #site-inline-banner-root {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 26px;
-  padding: 34px 30px 28px;
+  gap: 20px;
+  padding: 28px 24px 22px;
 }
 
 #site-inline-banner-title {
   margin: 0;
   color: var(--site-inline-banner-title);
-  font-size: clamp(24px, 3vw, 34px);
+  font-size: clamp(23px, 2.4vw, 30px);
   line-height: 1.15;
   font-weight: 700;
   letter-spacing: -0.04em;
@@ -90,13 +91,14 @@ html[data-theme="dark"] #site-inline-banner-root {
 
 #site-inline-banner-footer {
   border-top: 1px solid var(--site-inline-banner-divider);
-  padding: 18px 30px 24px;
+  padding: 16px 24px 22px;
+  background-color: var(--site-inline-banner-surface);
 }
 
 #site-inline-banner-legal {
   margin: 0;
   color: var(--site-inline-banner-text);
-  font-size: clamp(14px, 1.8vw, 17px);
+  font-size: clamp(14px, 1.55vw, 16px);
   line-height: 1.45;
   text-align: center;
 }
@@ -114,19 +116,19 @@ html[data-theme="dark"] #site-inline-banner-root {
 #site-inline-banner-actions {
   display: flex;
   justify-content: center;
-  margin-top: 18px;
+  margin-top: 14px;
 }
 
 #site-inline-banner-confirm {
   width: 100%;
-  min-height: 56px;
-  padding: 0 24px;
+  min-height: 52px;
+  padding: 0 22px;
   border: 0;
-  border-radius: 18px;
+  border-radius: 16px;
   background-color: var(--site-inline-banner-button);
   color: var(--site-inline-banner-button-text);
   font: inherit;
-  font-size: clamp(18px, 1.8vw, 22px);
+  font-size: clamp(17px, 1.55vw, 20px);
   font-weight: 700;
   letter-spacing: -0.02em;
   cursor: pointer;
@@ -138,31 +140,18 @@ html[data-theme="dark"] #site-inline-banner-root {
 
 .site-inline-banner-section {
   width: 100%;
-  max-width: 520px;
+  max-width: 440px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   text-align: center;
-}
-
-.site-inline-banner-icon {
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.site-inline-banner-icon svg {
-  width: 100%;
-  height: 100%;
 }
 
 .site-inline-banner-copy {
   margin: 0;
   color: var(--site-inline-banner-text);
-  font-size: clamp(16px, 1.8vw, 22px);
+  font-size: clamp(16px, 1.55vw, 20px);
   line-height: 1.4;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -182,22 +171,23 @@ html[data-theme="dark"] #site-inline-banner-root {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px 14px;
-  color: var(--site-inline-banner-subtle);
-  font-size: clamp(14px, 1.7vw, 18px);
+  gap: 8px 10px;
+  font-size: clamp(14px, 1.45vw, 16px);
   line-height: 1.35;
   font-weight: 600;
   letter-spacing: -0.03em;
 }
 
-#site-inline-banner-models span {
-  display: inline-flex;
-  align-items: center;
+#site-inline-banner-link {
+  color: var(--site-inline-banner-subtle);
+  text-decoration: none;
+  font: inherit;
 }
 
-#site-inline-banner-models code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.92em;
+#site-inline-banner-link:hover,
+#site-inline-banner-link:focus-visible {
+  color: var(--site-inline-banner-link);
+  text-decoration: underline;
 }
 
 @media (max-width: 590px) {
@@ -208,26 +198,21 @@ html[data-theme="dark"] #site-inline-banner-root {
   #site-inline-banner-modal {
     width: 100%;
     max-height: calc(100dvh - 32px);
-    border-radius: 24px;
+    border-radius: 20px;
   }
 
   #site-inline-banner-main {
-    gap: 22px;
-    padding: 28px 20px 22px;
+    gap: 18px;
+    padding: 24px 18px 18px;
   }
 
   #site-inline-banner-footer {
-    padding: 16px 20px 20px;
-  }
-
-  .site-inline-banner-icon {
-    width: 54px;
-    height: 54px;
+    padding: 14px 18px 18px;
   }
 
   #site-inline-banner-confirm {
-    min-height: 52px;
-    border-radius: 16px;
+    min-height: 48px;
+    border-radius: 14px;
   }
 }
 `);
@@ -237,6 +222,7 @@ html[data-theme="dark"] #site-inline-banner-root {
   (function () {
     var cookieName = ${cookieName};
     var cookieMaxAge = ${cookieMaxAge};
+    var storageKey = ${storageKey};
     var modalMarkup = ${modalMarkup};
     var styleCss = ${styleCss};
     var rootId = 'site-inline-banner-root';
@@ -245,6 +231,12 @@ html[data-theme="dark"] #site-inline-banner-root {
     var styleId = 'site-inline-banner-style';
 
     function hasClosedBanner() {
+      try {
+        if (window.localStorage.getItem(storageKey) === '1') {
+          return true;
+        }
+      } catch (error) {}
+
       var cookiePattern = new RegExp('(?:^|;\\\\s*)' + escapeRegExp(cookieName) + '=1(?:;|$)');
       return cookiePattern.test(document.cookie || '');
     }
@@ -266,6 +258,9 @@ html[data-theme="dark"] #site-inline-banner-root {
 
     function closeBanner() {
       document.cookie = cookieName + '=1; path=/; max-age=' + cookieMaxAge + '; SameSite=Lax; Secure';
+      try {
+        window.localStorage.setItem(storageKey, '1');
+      } catch (error) {}
 
       var root = document.getElementById(rootId);
       if (root) {
