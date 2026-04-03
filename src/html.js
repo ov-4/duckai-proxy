@@ -11,13 +11,14 @@ export async function replaceResponseText(response, upstreamDomain, hostName, re
     text = text.replace(new RegExp(source, 'g'), target);
   }
 
+  text = maybeInjectLocalStorageDefaults(text, config);
+
   if (!config.enableBanner) {
     return text;
   }
 
   const rawModeParam = config.rawModeParam || '__duckai_raw';
   if (isRawModeRequest(request, rawModeParam)) {
-    text = injectLocalStorageDefaults(text, config.localStorageDefaults);
     return injectRawModePersistence(text, rawModeParam);
   }
 
@@ -25,7 +26,7 @@ export async function replaceResponseText(response, upstreamDomain, hostName, re
     return buildBannerShell(text, request, config, rawModeParam);
   }
 
-  return injectLocalStorageDefaults(text, config.localStorageDefaults);
+  return text;
 }
 
 function resolveReplacementValue(value, upstreamDomain, hostName) {
@@ -49,4 +50,12 @@ function hasClosedBanner(request, cookieName) {
 function isRawModeRequest(request, rawModeParam) {
   const url = new URL(request.url);
   return url.searchParams.get(rawModeParam) === '1';
+}
+
+function maybeInjectLocalStorageDefaults(text, config) {
+  if (!config.enableLocalStorageDefaults) {
+    return text;
+  }
+
+  return injectLocalStorageDefaults(text, config.localStorageDefaults);
 }

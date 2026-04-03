@@ -6,6 +6,7 @@ export const config = {
   blockedRegions: [''],
   blockedIpAddresses: ['127.0.0.1'],
   enableBanner: false,
+  enableLocalStorageDefaults: true,
   localStorageDefaults: {
     duckaiReasoningMode: '"reasoning"',
     duckaiReasoningUsed: 'true',

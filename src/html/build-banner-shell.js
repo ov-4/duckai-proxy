@@ -5,7 +5,9 @@ export function buildBannerShell(text, request, config, rawModeParam) {
   const cookieName = JSON.stringify(config.bannerCookieName);
   const cookieMaxAge = JSON.stringify(config.bannerCookieMaxAge);
   const title = escapeHtml(extractTitle(text) || 'duck.ai');
-  const localStorageDefaultsScript = renderLocalStorageDefaultsScript(config.localStorageDefaults);
+  const localStorageDefaultsScript = config.enableLocalStorageDefaults
+    ? renderLocalStorageDefaultsScript(config.localStorageDefaults)
+    : '';
 
   return `<!doctype html>
 <html lang="en">
