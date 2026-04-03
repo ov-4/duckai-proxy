@@ -21,6 +21,8 @@ async function fetchAndApply(request) {
     return Response.redirect(url.href);
   }
 
+  url.searchParams.delete(config.rawModeParam);
+
   const upstreamDomain = isDesktopDevice(userAgent) ? config.upstream : config.upstreamMobile;
   url.host = upstreamDomain;
   url.protocol = 'https:';
@@ -56,6 +58,7 @@ async function fetchAndApply(request) {
   responseHeaders.delete('content-security-policy');
   responseHeaders.delete('content-security-policy-report-only');
   responseHeaders.delete('clear-site-data');
+  responseHeaders.delete('x-frame-options');
 
   const contentType = responseHeaders.get('content-type');
   const isHtml = contentType && contentType.toLowerCase().includes('text/html');

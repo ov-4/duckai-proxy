@@ -7,8 +7,13 @@ export async function replaceResponseText(response, upstreamDomain, hostName, re
     text = text.replace(new RegExp(source, 'g'), target);
   }
 
+  const rawModeParam = config.rawModeParam || '__duckai_raw';
+  if (isRawModeRequest(request, rawModeParam)) {
+    return injectRawModePersistence(text, rawModeParam);
+  }
+
   if (!hasClosedBanner(request, config.bannerCookieName)) {
-    text = injectBanner(text, config);
+    return buildBannerShell(text, request, config, rawModeParam);
   }
 
   return text;
@@ -32,269 +37,226 @@ function hasClosedBanner(request, cookieName) {
   return cookiePattern.test(cookieHeader);
 }
 
-function injectBanner(text, config) {
-  if (text.includes('id="site-banner"')) {
+function isRawModeRequest(request, rawModeParam) {
+  const url = new URL(request.url);
+  return url.searchParams.get(rawModeParam) === '1';
+}
+
+function buildBannerShell(text, request, config, rawModeParam) {
+  const iframeUrl = JSON.stringify(buildRawModeUrl(request.url, rawModeParam));
+  const cleanUrl = JSON.stringify(buildCleanUrl(request.url, rawModeParam));
+  const cookieName = JSON.stringify(config.bannerCookieName);
+  const cookieMaxAge = JSON.stringify(config.bannerCookieMaxAge);
+  const title = escapeHtml(extractTitle(text) || 'duck.ai');
+
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>${title}</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      background: #ffffff;
+    }
+
+    #site-banner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 12px 48px 12px 16px;
+      background: #111827;
+      color: #f9fafb;
+      font-size: 14px;
+      line-height: 1.5;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    #site-banner a {
+      color: #93c5fd;
+      text-decoration: underline;
+      word-break: break-all;
+    }
+
+    #site-banner button {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    #site-frame {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <div id="site-banner" role="banner">
+    ${config.bannerHtml || '<span></span>'}
+    <button type="button" aria-label="关闭横幅">&times;</button>
+  </div>
+  <iframe id="site-frame" src=${iframeUrl} referrerpolicy="same-origin" allow="clipboard-read; clipboard-write"></iframe>
+  <script>
+    (function () {
+      var closeButton = document.querySelector('#site-banner button');
+      if (!closeButton) {
+        return;
+      }
+
+      closeButton.addEventListener('click', function () {
+        document.cookie = ${cookieName} + '=1; path=/; max-age=' + ${cookieMaxAge} + '; SameSite=Lax; Secure';
+        window.location.replace(${cleanUrl});
+      });
+    })();
+  </script>
+</body>
+</html>`;
+}
+
+function injectRawModePersistence(text, rawModeParam) {
+  if (text.includes('id="site-raw-mode-script"')) {
     return text;
   }
 
-  const cookieName = JSON.stringify(config.bannerCookieName);
-  const cookieMaxAge = JSON.stringify(config.bannerCookieMaxAge);
-  const headMarkup = `
-<style>
-  :root {
-    --site-banner-height: 0px;
-  }
-
-  html.site-banner-active {
-    height: 100% !important;
-    overflow: hidden !important;
-  }
-
-  body.site-banner-active {
-    height: 100% !important;
-    overflow: hidden !important;
-    margin: 0 !important;
-  }
-
-  #site-banner {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 2147483647;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 12px 48px 12px 16px;
-    background: #111827;
-    color: #f9fafb;
-    font-size: 14px;
-    line-height: 1.5;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-  }
-
-  #site-banner a {
-    color: #93c5fd;
-    text-decoration: underline;
-    word-break: break-all;
-  }
-
-  #site-banner button {
-    position: absolute;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
-    border: 0;
-    background: transparent;
-    color: inherit;
-    font-size: 20px;
-    line-height: 1;
-    cursor: pointer;
-    padding: 4px;
-  }
-</style>
-<script>
+  const rawModeScript = `
+<script id="site-raw-mode-script">
   (function () {
-    if (window.__siteBannerViewportPatch) {
-      return;
+    var rawModeParam = ${JSON.stringify(rawModeParam)};
+
+    function toRawUrl(input) {
+      var url = new URL(input, window.location.href);
+      if (url.origin !== window.location.origin) {
+        return url.toString();
+      }
+
+      url.searchParams.set(rawModeParam, '1');
+      return url.toString();
     }
 
-    var state = window.__siteBannerViewportPatch = {
-      offset: 0
+    var originalPushState = history.pushState;
+    history.pushState = function (state, unused, url) {
+      if (typeof url === 'string') {
+        return originalPushState.call(history, state, unused, toRawUrl(url));
+      }
+
+      return originalPushState.call(history, state, unused, url);
     };
 
-    function getOffset() {
-      return state.offset || 0;
-    }
+    var originalReplaceState = history.replaceState;
+    history.replaceState = function (state, unused, url) {
+      if (typeof url === 'string') {
+        return originalReplaceState.call(history, state, unused, toRawUrl(url));
+      }
 
-    function patchWindowHeight(propertyName) {
-      var prototype = Object.getPrototypeOf(window);
-      var descriptor = Object.getOwnPropertyDescriptor(prototype, propertyName);
-      if (!descriptor || typeof descriptor.get !== 'function') {
+      return originalReplaceState.call(history, state, unused, url);
+    };
+
+    document.addEventListener('click', function (event) {
+      var target = event.target;
+      if (!target || typeof target.closest !== 'function') {
+        return;
+      }
+
+      var link = target.closest('a[href]');
+      if (!link) {
+        return;
+      }
+
+      if (link.target && link.target !== '_self') {
         return;
       }
 
       try {
-        Object.defineProperty(window, propertyName, {
-          configurable: true,
-          get: function () {
-            return Math.max(0, descriptor.get.call(window) - getOffset());
-          }
-        });
+        link.href = toRawUrl(link.href);
       } catch (error) {}
-    }
+    }, true);
 
-    function patchElementClientHeight(element) {
-      if (!element) {
-        return;
-      }
-
-      var prototype = Object.getPrototypeOf(element);
-      var descriptor = Object.getOwnPropertyDescriptor(prototype, 'clientHeight');
-      if (!descriptor || typeof descriptor.get !== 'function') {
+    document.addEventListener('submit', function (event) {
+      var form = event.target;
+      if (!form || !form.action) {
         return;
       }
 
       try {
-        Object.defineProperty(element, 'clientHeight', {
-          configurable: true,
-          get: function () {
-            return Math.max(0, descriptor.get.call(this) - getOffset());
-          }
-        });
+        form.action = toRawUrl(form.action);
       } catch (error) {}
-    }
+    }, true);
 
-    patchWindowHeight('innerHeight');
-    patchWindowHeight('outerHeight');
-    patchElementClientHeight(document.documentElement);
-
-    if (window.visualViewport) {
-      var viewportPrototype = Object.getPrototypeOf(window.visualViewport);
-      var viewportDescriptor = Object.getOwnPropertyDescriptor(viewportPrototype, 'height');
-      if (viewportDescriptor && typeof viewportDescriptor.get === 'function') {
-        try {
-          Object.defineProperty(window.visualViewport, 'height', {
-            configurable: true,
-            get: function () {
-              return Math.max(0, viewportDescriptor.get.call(window.visualViewport) - getOffset());
-            }
-          });
-        } catch (error) {}
-      }
+    if (window.location.search.indexOf(rawModeParam + '=1') === -1) {
+      history.replaceState(history.state, '', toRawUrl(window.location.href));
     }
   })();
 </script>`;
-
-  const bannerMarkup = `
-<div id="site-banner" role="banner">
-  ${config.bannerHtml || '<span></span>'}
-  <button type="button" aria-label="关闭横幅">&times;</button>
-</div>
-<script>
-  (function () {
-    var state = window.__siteBannerViewportPatch;
-    var html = document.documentElement;
-    var body = document.body;
-    var banner = document.getElementById('site-banner');
-    if (!state || !html || !body || !banner) {
-      return;
-    }
-
-    var bodyStyleCache = {
-      boxSizing: body.style.boxSizing,
-      paddingTop: body.style.paddingTop,
-      height: body.style.height,
-      minHeight: body.style.minHeight,
-      maxHeight: body.style.maxHeight,
-      overflow: body.style.overflow
-    };
-    var bodyClientHeightPatched = false;
-    var resizeObserver = null;
-
-    function patchBodyClientHeight() {
-      if (bodyClientHeightPatched) {
-        return;
-      }
-
-      var prototype = Object.getPrototypeOf(body);
-      var descriptor = Object.getOwnPropertyDescriptor(prototype, 'clientHeight');
-      if (!descriptor || typeof descriptor.get !== 'function') {
-        return;
-      }
-
-      try {
-        Object.defineProperty(body, 'clientHeight', {
-          configurable: true,
-          get: function () {
-            return Math.max(0, descriptor.get.call(this) - (state.offset || 0));
-          }
-        });
-      } catch (error) {
-        return;
-      }
-
-      bodyClientHeightPatched = true;
-    }
-
-    html.classList.add('site-banner-active');
-    body.classList.add('site-banner-active');
-
-    var closeButton = banner.querySelector('button');
-
-    function updateLayout() {
-      var bannerHeight = banner.offsetHeight;
-      var previousOffset = state.offset || 0;
-      state.offset = bannerHeight;
-      html.style.setProperty('--site-banner-height', bannerHeight + 'px');
-      body.style.boxSizing = 'border-box';
-      body.style.paddingTop = bannerHeight + 'px';
-      body.style.height = '100dvh';
-      body.style.minHeight = '100dvh';
-      body.style.maxHeight = '100dvh';
-      body.style.overflow = 'hidden';
-
-      if (bannerHeight !== previousOffset) {
-        window.dispatchEvent(new Event('resize'));
-      }
-    }
-
-    patchBodyClientHeight();
-    updateLayout();
-    window.addEventListener('resize', updateLayout);
-
-    if (typeof ResizeObserver === 'function') {
-      resizeObserver = new ResizeObserver(updateLayout);
-      resizeObserver.observe(banner);
-    }
-
-    function teardown() {
-      window.removeEventListener('resize', updateLayout);
-      if (resizeObserver) {
-        resizeObserver.disconnect();
-      }
-
-      state.offset = 0;
-      body.style.boxSizing = bodyStyleCache.boxSizing;
-      body.style.paddingTop = bodyStyleCache.paddingTop;
-      body.style.height = bodyStyleCache.height;
-      body.style.minHeight = bodyStyleCache.minHeight;
-      body.style.maxHeight = bodyStyleCache.maxHeight;
-      body.style.overflow = bodyStyleCache.overflow;
-      html.classList.remove('site-banner-active');
-      body.classList.remove('site-banner-active');
-      html.style.removeProperty('--site-banner-height');
-      banner.remove();
-      window.dispatchEvent(new Event('resize'));
-    }
-
-    if (!closeButton) {
-      return;
-    }
-
-    closeButton.addEventListener('click', function () {
-      document.cookie = ${cookieName} + '=1; path=/; max-age=' + ${cookieMaxAge} + '; SameSite=Lax; Secure';
-      teardown();
-    });
-  })();
-</script>`;
-
-  if (/<head[^>]*>/i.test(text)) {
-    text = text.replace(/<head[^>]*>/i, match => `${match}${headMarkup}`);
-  } else if (/<html[^>]*>/i.test(text)) {
-    text = text.replace(/<html[^>]*>/i, match => `${match}${headMarkup}`);
-  } else {
-    text = `${headMarkup}${text}`;
-  }
 
   if (/<\/body>/i.test(text)) {
-    return text.replace(/<\/body>/i, `${bannerMarkup}</body>`);
+    return text.replace(/<\/body>/i, `${rawModeScript}</body>`);
   }
 
   if (/<body[^>]*>/i.test(text)) {
-    return text.replace(/<body[^>]*>/i, match => `${match}${bannerMarkup}`);
+    return text.replace(/<body[^>]*>/i, match => `${match}${rawModeScript}`);
   }
 
-  return `${text}${bannerMarkup}`;
+  if (/<\/html>/i.test(text)) {
+    return text.replace(/<\/html>/i, `${rawModeScript}</html>`);
+  }
+
+  return `${text}${rawModeScript}`;
+}
+
+function buildRawModeUrl(urlString, rawModeParam) {
+  const url = new URL(urlString);
+  url.searchParams.set(rawModeParam, '1');
+  return url.toString();
+}
+
+function buildCleanUrl(urlString, rawModeParam) {
+  const url = new URL(urlString);
+  url.searchParams.delete(rawModeParam);
+  return url.toString();
+}
+
+function extractTitle(text) {
+  const match = text.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  return match ? decodeHtmlEntities(match[1].trim()) : '';
+}
+
+function decodeHtmlEntities(value) {
+  return value
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+function escapeHtml(value) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }

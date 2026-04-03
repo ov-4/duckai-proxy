@@ -5,6 +5,7 @@ export const config = {
   upstreamMobile: 'duck.ai',
   blockedRegions: [''],
   blockedIpAddresses: ['127.0.0.1'],
+  rawModeParam: '__duckai_raw',
   bannerHtml: bannerHtml,
   bannerCookieName: 'banner_closed',
   bannerCookieMaxAge: 60 * 60 * 24 * 365,
