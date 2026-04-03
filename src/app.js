@@ -19,8 +19,6 @@ export async function handleRequest(request, config) {
     return Response.redirect(url.href);
   }
 
-  url.searchParams.delete(config.rawModeParam);
-
   const upstreamDomain = isDesktopDevice(userAgent) ? config.upstream : config.upstreamMobile;
   url.host = upstreamDomain;
   url.protocol = 'https:';
