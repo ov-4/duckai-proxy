@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "duckai-proxy",
+  "name": "chat",
   "main": "src/index.js",
   "compatibility_date": "2026-04-03",
   "workers_dev": true
