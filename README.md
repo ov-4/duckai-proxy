@@ -1,8 +1,14 @@
 # DuckAI reverse proxy
 
-aka Duckduckgo AI
+Aka Duckduckgo AI
 
-works well on Cloudflare Workers & Deno, and perhaps your own servers
+Works well on Cloudflare Workers & Deno, and perhaps your own servers
+
+## Settings
+
+All settings are in `src/config.json`
+
+Do not change them unless you know what you are doing
 
 ## Deploy
 
