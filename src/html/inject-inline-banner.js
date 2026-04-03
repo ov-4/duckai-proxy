@@ -22,112 +22,177 @@ function renderInlineBannerScript(config) {
   const modalMarkup = JSON.stringify(bannerHtml);
   const styleCss = JSON.stringify(`
 #site-inline-banner-root {
+  --site-inline-banner-overlay: rgba(17, 17, 17, 0.72);
+  --site-inline-banner-surface: #f7f7f8;
+  --site-inline-banner-border: rgba(17, 17, 17, 0.08);
+  --site-inline-banner-divider: rgba(17, 17, 17, 0.08);
+  --site-inline-banner-title: #24252c;
+  --site-inline-banner-text: #2f3137;
+  --site-inline-banner-subtle: #6d7078;
+  --site-inline-banner-link: #4067e8;
+  --site-inline-banner-button: #4368e7;
+  --site-inline-banner-button-hover: #3d61dc;
+  --site-inline-banner-button-text: #ffffff;
   position: fixed;
-  inset: 0;
-  z-index: 2147483646;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  background-color: var(--sds-color-background-backdrop, rgba(17, 24, 39, 0.45));
+  padding: 32px;
+  background-color: var(--site-inline-banner-overlay);
+}
+
+html[data-theme="dark"] #site-inline-banner-root {
+  --site-inline-banner-overlay: rgba(0, 0, 0, 0.78);
+  --site-inline-banner-surface: #242424;
+  --site-inline-banner-border: rgba(255, 255, 255, 0.08);
+  --site-inline-banner-divider: rgba(255, 255, 255, 0.12);
+  --site-inline-banner-title: #f5f5f6;
+  --site-inline-banner-text: #f0f0f1;
+  --site-inline-banner-subtle: #b8bac0;
+  --site-inline-banner-link: #86a0ff;
+  --site-inline-banner-button: #6f8ef0;
+  --site-inline-banner-button-hover: #6485ea;
+  --site-inline-banner-button-text: #1e2333;
 }
 
 #site-inline-banner-modal {
-  width: min(90vw, 500px);
-  max-width: 500px;
-  max-height: 80vh;
+  width: min(92vw, 820px);
+  max-height: min(92vh, 1100px);
+  border: 1px solid var(--site-inline-banner-border);
+  border-radius: 34px;
+  background-color: var(--site-inline-banner-surface);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
   overflow: hidden;
-  border: 1px solid var(--sds-color-border-01, rgba(0, 0, 0, 0.12));
-  border-radius: 8px;
-  background-color: var(--sds-color-background-container-01, #ffffff);
-  color: var(--sds-color-text-01, #111111);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
 }
 
-#site-inline-banner-header {
+#site-inline-banner-main {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 20px;
-  border-bottom: 1px solid var(--sds-color-border-inner-divider, rgba(0, 0, 0, 0.09));
+  gap: 38px;
+  padding: 58px 46px 42px;
 }
 
 #site-inline-banner-title {
   margin: 0;
-  font-size: 18px;
-  line-height: 1.2;
-  font-weight: 600;
+  color: var(--site-inline-banner-title);
+  font-size: clamp(32px, 4vw, 52px);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  text-align: center;
 }
 
-#site-inline-banner-close {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  padding: 8px;
-  border: 0;
-  border-radius: 4px;
-  background: none;
-  color: var(--sds-color-text-02, rgba(0, 0, 0, 0.6));
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
+#site-inline-banner-footer {
+  border-top: 1px solid var(--site-inline-banner-divider);
+  padding: 26px 46px 30px;
 }
 
-#site-inline-banner-close:hover {
-  background-color: var(--sds-color-background-utility, rgba(0, 0, 0, 0.06));
-  color: var(--sds-color-text-01, #111111);
+#site-inline-banner-legal {
+  margin: 0;
+  color: var(--site-inline-banner-text);
+  font-size: clamp(15px, 2.1vw, 22px);
+  line-height: 1.45;
+  text-align: center;
 }
 
-#site-inline-banner-body {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-height: calc(80vh - 77px);
-  padding: 20px;
-  overflow: auto;
-  color: var(--sds-color-text-03, rgba(0, 0, 0, 0.72));
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-#site-inline-banner-body a {
-  color: var(--sds-color-text-accent-01, #3969ef);
+#site-inline-banner-legal a {
+  color: var(--site-inline-banner-link);
   text-decoration: none;
 }
 
-#site-inline-banner-body a:hover,
-#site-inline-banner-body a:focus-visible {
+#site-inline-banner-legal a:hover,
+#site-inline-banner-legal a:focus-visible {
   text-decoration: underline;
-}
-
-#site-inline-banner-body code {
-  font-family: var(--sds-font-family-monospace, ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 12px;
 }
 
 #site-inline-banner-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  margin-top: 28px;
 }
 
 #site-inline-banner-confirm {
-  min-width: 112px;
-  min-height: 40px;
-  padding: 0 16px;
+  width: 100%;
+  min-height: 72px;
+  padding: 0 28px;
   border: 0;
-  border-radius: 999px;
-  background-color: var(--theme-col-bg-button-primary, #3969ef);
-  color: var(--theme-col-txt-button-primary, #ffffff);
+  border-radius: 22px;
+  background-color: var(--site-inline-banner-button);
+  color: var(--site-inline-banner-button-text);
   font: inherit;
-  font-weight: 600;
+  font-size: clamp(20px, 2vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
   cursor: pointer;
 }
 
 #site-inline-banner-confirm:hover {
-  background-color: var(--theme-col-bg-button-primary-hover, #2b55ca);
+  background-color: var(--site-inline-banner-button-hover);
+}
+
+.site-inline-banner-section {
+  width: 100%;
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.site-inline-banner-icon {
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-inline-banner-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.site-inline-banner-copy {
+  margin: 0;
+  color: var(--site-inline-banner-text);
+  font-size: clamp(20px, 2.2vw, 33px);
+  line-height: 1.35;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.site-inline-banner-copy-strong {
+  margin: 0 0 10px;
+  color: var(--site-inline-banner-text);
+  font-size: clamp(22px, 2.2vw, 34px);
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+#site-inline-banner-models {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 24px;
+  color: var(--site-inline-banner-subtle);
+  font-size: clamp(18px, 2vw, 28px);
+  line-height: 1.25;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+
+#site-inline-banner-models span {
+  display: inline-flex;
+  align-items: center;
 }
 
 @media (max-width: 590px) {
@@ -137,13 +202,27 @@ function renderInlineBannerScript(config) {
 
   #site-inline-banner-modal {
     width: 100%;
-    max-height: calc(100vh - 32px);
     max-height: calc(100dvh - 32px);
+    border-radius: 28px;
   }
 
-  #site-inline-banner-body {
-    max-height: calc(100vh - 109px);
-    max-height: calc(100dvh - 109px);
+  #site-inline-banner-main {
+    gap: 28px;
+    padding: 38px 24px 30px;
+  }
+
+  #site-inline-banner-footer {
+    padding: 22px 24px 24px;
+  }
+
+  .site-inline-banner-icon {
+    width: 72px;
+    height: 72px;
+  }
+
+  #site-inline-banner-confirm {
+    min-height: 58px;
+    border-radius: 18px;
   }
 }
 `);
@@ -157,7 +236,6 @@ function renderInlineBannerScript(config) {
     var styleCss = ${styleCss};
     var rootId = 'site-inline-banner-root';
     var modalId = 'site-inline-banner-modal';
-    var closeId = 'site-inline-banner-close';
     var confirmId = 'site-inline-banner-confirm';
     var styleId = 'site-inline-banner-style';
 
@@ -204,22 +282,14 @@ function renderInlineBannerScript(config) {
       }
 
       var modal = root.querySelector('#' + modalId);
-      var closeButton = root.querySelector('#' + closeId);
       var confirmButton = root.querySelector('#' + confirmId);
-      if (!modal || !closeButton || !confirmButton) {
+      if (!modal || !confirmButton) {
         return;
       }
 
-      closeButton.addEventListener('click', closeBanner);
       confirmButton.addEventListener('click', closeBanner);
-      root.addEventListener('click', function (event) {
-        if (event.target === root) {
-          closeBanner();
-        }
-      });
-
       document.body.appendChild(root);
-      closeButton.focus();
+      confirmButton.focus();
     }
 
     function mountInlineBanner() {
