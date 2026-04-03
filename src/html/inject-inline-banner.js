@@ -61,12 +61,12 @@ html[data-theme="dark"] #site-inline-banner-root {
 }
 
 #site-inline-banner-modal {
-  width: min(92vw, 820px);
-  max-height: min(92vh, 1100px);
+  width: min(90vw, 620px);
+  max-height: min(90vh, 860px);
   border: 1px solid var(--site-inline-banner-border);
-  border-radius: 34px;
+  border-radius: 28px;
   background-color: var(--site-inline-banner-surface);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 18px 56px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
 
@@ -74,15 +74,15 @@ html[data-theme="dark"] #site-inline-banner-root {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 38px;
-  padding: 58px 46px 42px;
+  gap: 26px;
+  padding: 34px 30px 28px;
 }
 
 #site-inline-banner-title {
   margin: 0;
   color: var(--site-inline-banner-title);
-  font-size: clamp(32px, 4vw, 52px);
-  line-height: 1.05;
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.15;
   font-weight: 700;
   letter-spacing: -0.04em;
   text-align: center;
@@ -90,13 +90,13 @@ html[data-theme="dark"] #site-inline-banner-root {
 
 #site-inline-banner-footer {
   border-top: 1px solid var(--site-inline-banner-divider);
-  padding: 26px 46px 30px;
+  padding: 18px 30px 24px;
 }
 
 #site-inline-banner-legal {
   margin: 0;
   color: var(--site-inline-banner-text);
-  font-size: clamp(15px, 2.1vw, 22px);
+  font-size: clamp(14px, 1.8vw, 17px);
   line-height: 1.45;
   text-align: center;
 }
@@ -114,19 +114,19 @@ html[data-theme="dark"] #site-inline-banner-root {
 #site-inline-banner-actions {
   display: flex;
   justify-content: center;
-  margin-top: 28px;
+  margin-top: 18px;
 }
 
 #site-inline-banner-confirm {
   width: 100%;
-  min-height: 72px;
-  padding: 0 28px;
+  min-height: 56px;
+  padding: 0 24px;
   border: 0;
-  border-radius: 22px;
+  border-radius: 18px;
   background-color: var(--site-inline-banner-button);
   color: var(--site-inline-banner-button-text);
   font: inherit;
-  font-size: clamp(20px, 2vw, 26px);
+  font-size: clamp(18px, 1.8vw, 22px);
   font-weight: 700;
   letter-spacing: -0.02em;
   cursor: pointer;
@@ -138,17 +138,17 @@ html[data-theme="dark"] #site-inline-banner-root {
 
 .site-inline-banner-section {
   width: 100%;
-  max-width: 700px;
+  max-width: 520px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 12px;
   text-align: center;
 }
 
 .site-inline-banner-icon {
-  width: 88px;
-  height: 88px;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -162,18 +162,18 @@ html[data-theme="dark"] #site-inline-banner-root {
 .site-inline-banner-copy {
   margin: 0;
   color: var(--site-inline-banner-text);
-  font-size: clamp(20px, 2.2vw, 33px);
-  line-height: 1.35;
-  font-weight: 650;
+  font-size: clamp(16px, 1.8vw, 22px);
+  line-height: 1.4;
+  font-weight: 600;
   letter-spacing: -0.03em;
   text-align: center;
 }
 
 .site-inline-banner-copy-strong {
-  margin: 0 0 10px;
+  margin: 0 0 6px;
   color: var(--site-inline-banner-text);
-  font-size: clamp(22px, 2.2vw, 34px);
-  line-height: 1.25;
+  font-size: clamp(17px, 1.9vw, 24px);
+  line-height: 1.3;
   font-weight: 700;
   letter-spacing: -0.03em;
 }
@@ -182,17 +182,22 @@ html[data-theme="dark"] #site-inline-banner-root {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px 24px;
+  gap: 8px 14px;
   color: var(--site-inline-banner-subtle);
-  font-size: clamp(18px, 2vw, 28px);
-  line-height: 1.25;
-  font-weight: 650;
+  font-size: clamp(14px, 1.7vw, 18px);
+  line-height: 1.35;
+  font-weight: 600;
   letter-spacing: -0.03em;
 }
 
 #site-inline-banner-models span {
   display: inline-flex;
   align-items: center;
+}
+
+#site-inline-banner-models code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.92em;
 }
 
 @media (max-width: 590px) {
@@ -203,26 +208,26 @@ html[data-theme="dark"] #site-inline-banner-root {
   #site-inline-banner-modal {
     width: 100%;
     max-height: calc(100dvh - 32px);
-    border-radius: 28px;
+    border-radius: 24px;
   }
 
   #site-inline-banner-main {
-    gap: 28px;
-    padding: 38px 24px 30px;
+    gap: 22px;
+    padding: 28px 20px 22px;
   }
 
   #site-inline-banner-footer {
-    padding: 22px 24px 24px;
+    padding: 16px 20px 20px;
   }
 
   .site-inline-banner-icon {
-    width: 72px;
-    height: 72px;
+    width: 54px;
+    height: 54px;
   }
 
   #site-inline-banner-confirm {
-    min-height: 58px;
-    border-radius: 18px;
+    min-height: 52px;
+    border-radius: 16px;
   }
 }
 `);
