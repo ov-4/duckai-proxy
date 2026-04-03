@@ -3,7 +3,12 @@ export function buildRequestHeaders(request, upstreamDomain) {
   const requestOrigin = new URL(request.url).origin;
   const upstreamOrigin = `https://${upstreamDomain}`;
 
-  headers.set('Host', upstreamDomain);
+  try {
+    headers.set('Host', upstreamDomain);
+  } catch {
+    // Some runtimes manage Host automatically for outgoing fetch requests.
+  }
+
   headers.set('Origin', upstreamOrigin);
   headers.set('Referer', `${upstreamOrigin}/`);
   headers.set('Sec-Fetch-Site', 'same-origin');

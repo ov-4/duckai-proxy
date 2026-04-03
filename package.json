@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "dev:cf": "wrangler dev",
+    "deploy:cf": "wrangler deploy",
+    "dev:deno": "deno task dev",
+    "deploy:deno": "deno deploy --prod src/deno.js"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"

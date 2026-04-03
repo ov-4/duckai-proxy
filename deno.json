@@ -1,0 +1,6 @@
+{
+  "unstable": ["raw-imports"],
+  "tasks": {
+    "dev": "deno run --watch --allow-net --unstable-raw-imports src/deno.js"
+  }
+}
