@@ -37,11 +37,25 @@ function injectBanner(text, config) {
     return text;
   }
 
+  const cookieName = JSON.stringify(config.bannerCookieName);
+  const cookieMaxAge = JSON.stringify(config.bannerCookieMaxAge);
   const bannerMarkup = `
 <style>
+  html.site-banner-active {
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  body.site-banner-active {
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
   #site-banner {
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 2147483647;
     display: flex;
     align-items: center;
@@ -74,6 +88,15 @@ function injectBanner(text, config) {
     cursor: pointer;
     padding: 4px;
   }
+
+  #site-banner-page {
+    position: fixed;
+    top: var(--site-banner-height, 0px);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+  }
 </style>
 <div id="site-banner" role="banner">
   ${config.bannerHtml || '<span></span>'}
@@ -81,22 +104,77 @@ function injectBanner(text, config) {
 </div>
 <script>
   (function () {
+    var html = document.documentElement;
+    var body = document.body;
     var banner = document.getElementById('site-banner');
-    if (!banner) {
+    if (!html || !body || !banner) {
       return;
     }
 
+    var page = document.getElementById('site-banner-page');
+    if (!page) {
+      page = document.createElement('div');
+      page.id = 'site-banner-page';
+    }
+
+    Array.from(body.childNodes).forEach(function (node) {
+      if (node === banner || node === page || (node.nodeType === Node.ELEMENT_NODE && node.tagName === 'SCRIPT' && node === document.currentScript)) {
+        return;
+      }
+
+      page.appendChild(node);
+    });
+
+    body.insertBefore(page, banner);
+    html.classList.add('site-banner-active');
+    body.classList.add('site-banner-active');
+
     var closeButton = banner.querySelector('button');
+    var resizeObserver = null;
+
+    function updateLayout() {
+      html.style.setProperty('--site-banner-height', banner.offsetHeight + 'px');
+    }
+
+    updateLayout();
+    window.addEventListener('resize', updateLayout);
+
+    if (typeof ResizeObserver === 'function') {
+      resizeObserver = new ResizeObserver(updateLayout);
+      resizeObserver.observe(banner);
+    }
+
+    function teardown() {
+      window.removeEventListener('resize', updateLayout);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
+
+      while (page.firstChild) {
+        body.insertBefore(page.firstChild, page);
+      }
+
+      page.remove();
+      html.classList.remove('site-banner-active');
+      body.classList.remove('site-banner-active');
+      html.style.removeProperty('--site-banner-height');
+      banner.remove();
+    }
+
     if (!closeButton) {
       return;
     }
 
     closeButton.addEventListener('click', function () {
-      document.cookie = '${config.bannerCookieName}=1; path=/; max-age=${config.bannerCookieMaxAge}; SameSite=Lax; Secure';
-      banner.remove();
+      document.cookie = ${cookieName} + '=1; path=/; max-age=' + ${cookieMaxAge} + '; SameSite=Lax; Secure';
+      teardown();
     });
   })();
 </script>`;
+
+  if (/<\/body>/i.test(text)) {
+    return text.replace(/<\/body>/i, `${bannerMarkup}</body>`);
+  }
 
   if (/<body[^>]*>/i.test(text)) {
     return text.replace(/<body[^>]*>/i, match => `${match}${bannerMarkup}`);
