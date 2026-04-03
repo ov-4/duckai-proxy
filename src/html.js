@@ -1,6 +1,5 @@
-import { buildBannerShell } from './html/build-banner-shell.js';
+import { injectInlineBanner } from './html/inject-inline-banner.js';
 import { injectLocalStorageDefaults } from './html/inject-local-storage-defaults.js';
-import { injectRawModePersistence } from './html/inject-raw-mode-persistence.js';
 
 export async function replaceResponseText(response, upstreamDomain, hostName, request, config) {
   let text = await response.text();
@@ -17,13 +16,8 @@ export async function replaceResponseText(response, upstreamDomain, hostName, re
     return text;
   }
 
-  const rawModeParam = config.rawModeParam || '__duckai_raw';
-  if (isRawModeRequest(request, rawModeParam)) {
-    return injectRawModePersistence(text, rawModeParam);
-  }
-
   if (!hasClosedBanner(request, config.bannerCookieName)) {
-    return buildBannerShell(text, request, config, rawModeParam);
+    return injectInlineBanner(text, config);
   }
 
   return text;
@@ -45,11 +39,6 @@ function hasClosedBanner(request, cookieName) {
   const cookieHeader = request.headers.get('Cookie') || '';
   const cookiePattern = new RegExp(`(?:^|;\\s*)${cookieName}=1(?:;|$)`);
   return cookiePattern.test(cookieHeader);
-}
-
-function isRawModeRequest(request, rawModeParam) {
-  const url = new URL(request.url);
-  return url.searchParams.get(rawModeParam) === '1';
 }
 
 function maybeInjectLocalStorageDefaults(text, config) {
