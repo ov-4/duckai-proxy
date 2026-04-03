@@ -1,6 +1,5 @@
 # duckai_proxy
-Reverse Proxy for Duck.ai
 
-## Deployment
+## Deploy
 
-copy & paste everything in `worker.js`
+`npm install && npx wrangler login && npx wrangler deploy`。
