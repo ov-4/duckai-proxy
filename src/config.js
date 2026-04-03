@@ -1,4 +1,4 @@
-import bannerHtml from './banner.html';
+import bannerHtml from './banner.html' with { type: 'text' };
 
 export const config = {
   upstream: 'duck.ai',
