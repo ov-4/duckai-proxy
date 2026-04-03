@@ -5,6 +5,7 @@ export const config = {
   upstreamMobile: 'duck.ai',
   blockedRegions: [''],
   blockedIpAddresses: ['127.0.0.1'],
+  enableBanner: false,
   localStorageDefaults: {
     duckaiReasoningMode: '"reasoning"',
     duckaiReasoningUsed: 'true',

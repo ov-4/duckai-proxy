@@ -11,6 +11,10 @@ export async function replaceResponseText(response, upstreamDomain, hostName, re
     text = text.replace(new RegExp(source, 'g'), target);
   }
 
+  if (!config.enableBanner) {
+    return text;
+  }
+
   const rawModeParam = config.rawModeParam || '__duckai_raw';
   if (isRawModeRequest(request, rawModeParam)) {
     text = injectLocalStorageDefaults(text, config.localStorageDefaults);
